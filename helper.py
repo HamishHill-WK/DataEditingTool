@@ -2,6 +2,12 @@ import numpy as np
 import pandas as pd
 #this file contains some helpful functions for the notebook
 
+#counts the number of individual data points in a dataframe
+def number_of_entries(df : pd.DataFrame):
+    print('Number of files: ' + repr(len(df)))
+    print( 'Total number of data entries = '  + repr(df.columns.size)  + ' columns * ' + repr(df['Unnamed: 0'].size) + ' files = ' + repr(df.columns.size *  df['Unnamed: 0'].size))
+    print( 'Total number of data entries (excluding index) = ' + repr(df.columns.size - 1)  + ' * ' + repr(df['Unnamed: 0'].size) + ' = ' + repr((df.columns.size - 1) * df['Unnamed: 0'].size))
+
 #calculate the mean
 def mean(array):
     return sum(array)/len(array)
