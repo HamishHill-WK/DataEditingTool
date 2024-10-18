@@ -2,4 +2,4 @@
 
 ## Hamish Hill 2002431 
 
-modules: pandas, numpy, dash, statsmodel
+modules: pandas, numpy, dash

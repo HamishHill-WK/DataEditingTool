@@ -1,3 +1,4 @@
 labs/
 .venv/
 .vscode/
+.code-workspace
