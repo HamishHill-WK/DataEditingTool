@@ -1,99 +1,149 @@
-import numpy as np
-import pandas as pd
 #this file contains some helpful functions for the notebook
 
 #counts the number of individual data points in an array
-def number_of_entries(df):
-    size = len(df)
-    print('Number of files: ' + repr(size))
-    print( 'Total number of data entries = '  + repr(df.columns.size)  + ' columns * ' + repr(df['Unnamed: 0'].size) + ' files = ' + repr(df.columns.size *  df['Unnamed: 0'].size))
-    print( 'Total number of data entries (excluding index) = ' + repr(df.columns.size - 1)  + ' * ' + repr(df['Unnamed: 0'].size) + ' = ' + repr((df.columns.size - 1) * df['Unnamed: 0'].size))
+def number_of_entries(my_map : map):
+    size = len(my_map)
+    print('Number of data columns: ' + repr(size))
+    first_value_length = len(my_map[next(iter(my_map))]) #get the length of the first array in the map. We only need the first array as they are all the same size
+    print( 'Total number of data entries = '  + repr(size)  + ' columns * ' + repr(first_value_length) + ' files = ' + repr(size *  first_value_length))
 
 #calculate the mean
-def mean(array):
+def mean(array : list):
     return sum(array)/len(array)
 
 #calculate variance
-def variance(array):
-    this_mean = mean(array)
-    return sum((x - this_mean) ** 2 for x in array) / len(array)
+def variance(array : list):
+    my_mean = mean(array)
+    return sum((x - my_mean) ** 2 for x in array) / len(array)
 
 #calculate standard deviation
-def standard_dev(array):
+def standard_dev(array : list):
     return variance(array) ** 0.5
 
-def range(array):
+#calculate range 
+def range(array : list):
     return max(array) - min(array)
 
-def median(array):
-    #print(array)
+#find median value
+def median(array : list):
     array.sort() # to find the median first we must sort the list
-    #print(repr(array) + " ") 
     size = len(array)
-    #print(size //2)
     if size % 2 != 0:   #if the size of the array is odd 
-        print(array[size//2])
         return array[size//2]   #take the middle element
-    else:               #else it is even
+    else:               #else size is even
         lower_median = array[(size - 1) // 2]  #so we must find the two middle elements
         higher_median = array[size // 2]
-        #print(mean([higher_median, lower_median]))
         return mean([higher_median, lower_median])  #and calculate the average
-    
-def lower_quartile(array):
-    array.sort()
-    size = len(array)
-    mid_index = size //2
-    if size % 2 != 0:
-        lower_half = array[:mid_index + 1]
-    else:
-        lower_half = array[:mid_index]
-    return median(lower_half)
 
-def upper_quartile(array):
-    array.sort()
+#find lower quartile value
+def lower_quartile(array : list):
+    array.sort()    #first we sort the array 
     size = len(array)
-    mid_index = size //2
-    if size % 2 != 0:
-        upper_half = array[mid_index + 1:]
+    mid_index = size // 2 #then find the middle index
+    if size % 2 != 0:       #if the length of the array is odd 
+        lower_half = array[:mid_index + 1]  #we get the array sliced up to mid index + 1. We +1 because indexs start from 0
     else:
-        upper_half = array[mid_index:]
-    return median(upper_half)
+        lower_half = array[:mid_index] #if its even we just use the mid index because we rounded down earlier with //2
+    return median(lower_half) #then find the median of the lower half of the data 
+
+#find upper quartile value
+def upper_quartile(array : list):
+    array.sort()#first we sort the array 
+    size = len(array)
+    mid_index = size // 2#then find the middle index
+    if size % 2 != 0:  #if the length of the array is odd 
+        upper_half = array[mid_index + 1:] #we get the array sliced mid index + 1 to the end. We +1 because indexs start from 0
+    else:
+        upper_half = array[mid_index:] #if its even we just use the mid index because we rounded down earlier with //2
+    return median(upper_half) #then find the median of the upper half of the data 
+
+#calculate skewness of a list. Near 0 means that the data is normally distributed
+def skew(array : list):
+    n = len(array)
+    my_mean = mean(array)
+    std_dev = standard_dev(array)
+    skewness = (n * sum(((x - my_mean) / std_dev) ** 3 for x in array)) / ((n - 1) * (n - 2))
+    return skewness
 
 #function to check if a variable is a numpy float or int
 def is_int_or_float(number):
-    return isinstance(number, (np.integer, np.floating))
+    return isinstance(number, (int, float))
 
-def is_int_or_float_list(list):
+#check if a list only contains ints or floats
+def is_int_or_float_list(list : list):
     for item in list:
-        #print(repr(type(item)) + " " + item)
         if isinstance(item, int):
             continue
         elif isinstance(item, float):
             continue
         else:
-            #print("false :" + repr(item))
             return False
     return True
 
 #convert miliseconds to string of minutes and seconds for readibility
 def ms_to_minutes_seconds(milliseconds):
-    if not is_int_or_float(milliseconds):
+    if not isinstance(milliseconds, (int, float)):
         return milliseconds
     total_seconds = milliseconds // 1000
     minutes = total_seconds // 60
     seconds = total_seconds % 60
     return str(repr(int(minutes)) + "m and " + repr(int(seconds)) + "s")
 
-#This data frame will contain descriptive statistics includes variance and range about the data
-#similar to the pandas own describe().transpose()function but I've added variance and Range, as well as a special condition to convert the milliseconds column to minutes and seconds
-def descriptive_stats_extended(df : map):
-    stat_map = { 'Column name' : [], 'Mean' : [], 'Standard deviation' : [], 'Variance' : [], 'Min' : [], 'Max' : [], 'Range' : [], 'Lower Quartile' : [], 'Median' : [], 'Upper Quartile' : []}
+# Function to parse a CSV line with support for quoted strings
+def parse_csv_line(line):
+    result = []
+    current_field = []
+    inside_quotes = False
+    for char in line:
+        if char == '"':
+            # Toggle the inside_quotes flag when encountering a quote
+            inside_quotes = not inside_quotes
+        elif char == ',' and not inside_quotes:
+            # If we encounter a comma and we're not inside quotes, split the field
+            result.append(''.join(current_field).strip())
+            current_field = []
+        else:
+            # Add the character to the current field
+            current_field.append(char)
+
+    # Append the last field
+    result.append(''.join(current_field).strip())
+    return result
+
+#load a csv file as a map object 
+def load_csv_as_map(file_path):
+    my_map = {}
+    with open(file_path, 'r', encoding='utf-8') as file:    # Open the CSV file
+        lines = file.readlines()
+        header = lines[0].strip().split(',')        # First line becomes the keys of the dictionary
+        for key in header:
+            my_map[key] = []         # Initialize each key in the dictionary with an empty list
+        for line in lines[1:]:         # Iterate over the remaining rows
+            values = parse_csv_line(line.strip())             # Split the row into values
+            for i, key in enumerate(header):             # For each value, try to convert it to int, float or bool where applicable
+                value = values[i]
+                try:
+                    if value == 'False':                    
+                        value = False
+                    elif value == 'True':
+                        value = True
+                    elif '.' in value or 'e-' in value:    
+                        value = float(value) 
+                    else:
+                        value = int(value)
+                except ValueError:
+                    pass
+                        
+                my_map[key].append(value)
+
+    return my_map
+
+#similar to the pandas own describe() function but I've added variance and range
+def descriptive_stats_extended(df ):
+    stat_map = { 'Column name' : [], 'Mean' : [], 'Standard deviation' : [], 'Variance' : [], 'Min' : [], 'Max' : [], 'Range' : [], 'Lower Quartile' : [], 'Median' : [], 'Upper Quartile' : [], 'Skewness' : []}
     for key, value in df.items():
-        #print(value[1:])
         if key == '':
             continue #this is used to skip calculating values for the index row as it is pointless to perform calculations on it.
-        #print(is_int_or_float_list(value))
         if is_int_or_float_list(value): #also ensure the columns we are performing calculations on only contain numerical values
             stat_map['Column name'].append(key)
             stat_map['Mean'].append(mean(value))
@@ -104,34 +154,7 @@ def descriptive_stats_extended(df : map):
             stat_map['Range'].append(range(value))
             stat_map['Lower Quartile'].append(lower_quartile(value))
             stat_map['Median'].append(median(value))
-            stat_map['Upper Quartile'].append(upper_quartile(value))
+            stat_map['Upper Quartile'].append(upper_quartile(value)),
+            stat_map['Skewness'].append(skew(value))
             
-            #if key == 'duration_ms': #add a minutes and seconds column after the duration in miliseconds column to improve readibility of song times
-            #    statsdf.loc[loop_count + 1] = statsdf.loc[loop_count].apply(ms_to_minutes_seconds)
-             #   statsdf.loc[loop_count + 1, 'Column'] = 'duration minutes and seconds'
-
     return stat_map
-
-def descriptive_stats_extended_pandas(df : pd.DataFrame):
-    statsdf = pd.DataFrame(columns=['Column', 'Mean', 'Standard deviation', 'Variance', 'Min', 'Max', 'Range', 'Lower Quartile', 'Median', 'Upper Quartile'])
-    for loop_count, column in enumerate(df.columns):
-        if loop_count == 0:
-            continue #this is used to skip calculating values for the index row as it is pointless to perform calculations on it.
-        
-        if df[column].dtype == np.int64 or df[column].dtype == np.float64: #also ensure the columns we are performing calculations on only contain numerical values
-            statsdf.loc[loop_count] = [column,
-                                    mean(df[column]),
-                                    standard_dev(df[column]),
-                                    variance(df[column]),
-                                    min(df[column]),
-                                    max(df[column]),
-                                    range(df[column]),
-                                    lower_quartile(df[column]),
-                                    median(df[column]),
-                                    upper_quartile(df[column])]
-            if column == 'duration_ms': #add a minutes and seconds column after the duration in miliseconds column to improve readibility of song times
-                statsdf.loc[loop_count + 1] = statsdf.loc[loop_count].apply(ms_to_minutes_seconds)
-                statsdf.loc[loop_count + 1, 'Column'] = 'duration minutes and seconds'
-
-    #statsdf.set_index('Column', inplace=True)
-    return statsdf
