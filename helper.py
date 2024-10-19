@@ -2,10 +2,13 @@
 
 #counts the number of individual data points in an array
 def number_of_entries(my_map : map):
-    size = len(my_map)
-    print('Number of data columns: ' + repr(size))
+    size = len(my_map) - 1 #subtract one to exclude the index 
+    print('Number of data columns: ' + repr(size)) 
     first_value_length = len(my_map[next(iter(my_map))]) #get the length of the first array in the map. We only need the first array as they are all the same size
-    print( 'Total number of data entries = '  + repr(size)  + ' columns * ' + repr(first_value_length) + ' files = ' + repr(size *  first_value_length))
+    total_data_number = first_value_length * size
+    print( 'Total number of data entries = '  + repr(size)  + ' columns * ' + repr(first_value_length) + ' files = ' + repr(total_data_number))
+    return total_data_number
+    
 
 #calculate the mean
 def mean(array : list):
@@ -120,14 +123,10 @@ def load_csv_as_map(file_path):
             my_map[key] = []         # Initialize each key in the dictionary with an empty list
         for line in lines[1:]:         # Iterate over the remaining rows
             values = parse_csv_line(line.strip())             # Split the row into values
-            for i, key in enumerate(header):             # For each value, try to convert it to int, float or bool where applicable
+            for i, key in enumerate(header):             # For each value, try to convert it to int, float 
                 value = values[i]
                 try:
-                    if value == 'False':                    
-                        value = False
-                    elif value == 'True':
-                        value = True
-                    elif '.' in value or 'e-' in value:    
+                    if '.' in value or 'e-' in value:    
                         value = float(value) 
                     else:
                         value = int(value)
@@ -139,13 +138,13 @@ def load_csv_as_map(file_path):
     return my_map
 
 #similar to the pandas own describe() function but I've added variance and range
-def descriptive_stats_extended(df ):
-    stat_map = { 'Column name' : [], 'Mean' : [], 'Standard deviation' : [], 'Variance' : [], 'Min' : [], 'Max' : [], 'Range' : [], 'Lower Quartile' : [], 'Median' : [], 'Upper Quartile' : [], 'Skewness' : []}
+def descriptive_stats(df : map):
+    stat_map = { 'Column' : [], 'Mean' : [], 'Standard deviation' : [], 'Variance' : [], 'Min' : [], 'Max' : [], 'Range' : [], 'Lower Quartile' : [], 'Median' : [], 'Upper Quartile' : [], 'Skewness' : []}
     for key, value in df.items():
-        if key == '':
+        if key == '' or key == 'Unnamed: 0':
             continue #this is used to skip calculating values for the index row as it is pointless to perform calculations on it.
         if is_int_or_float_list(value): #also ensure the columns we are performing calculations on only contain numerical values
-            stat_map['Column name'].append(key)
+            stat_map['Column'].append(key)
             stat_map['Mean'].append(mean(value))
             stat_map['Standard deviation'].append(standard_dev(value))
             stat_map['Variance'].append(variance(value))
