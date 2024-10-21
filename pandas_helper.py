@@ -45,7 +45,7 @@ def descriptive_stats_extended(df : pd.DataFrame):
                                     df[column].quantile(0.25),
                                     df[column].median(),
                                     df[column].quantile(0.75),
-                                    h.skew(df[column])]
+                                    df[column].skew()]
 
     return statsdf
 

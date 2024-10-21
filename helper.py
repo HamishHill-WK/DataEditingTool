@@ -92,6 +92,13 @@ def ms_to_minutes_seconds(milliseconds):
     seconds = total_seconds % 60
     return str(repr(int(minutes)) + "m and " + repr(int(seconds)) + "s")
 
+def convert_ms_array(my_map : map):
+    if 'duration_ms' in my_map['Column']:
+        index = my_map['Column'].index('duration_ms')
+        for key in my_map:
+            my_map[key][index] = ms_to_minutes_seconds(my_map[key][index])
+        return my_map
+
 # Function to parse a CSV line with support for quoted strings
 def parse_csv_line(line):
     result = []
