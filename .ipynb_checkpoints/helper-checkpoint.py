@@ -9,6 +9,7 @@ def number_of_entries(my_map : map):
     print( 'Total number of data entries = '  + repr(size)  + ' columns * ' + repr(first_value_length) + ' files = ' + repr(total_data_number))
     return total_data_number
     
+
 #calculate the mean
 def mean(array : list):
     return sum(array)/len(array)
