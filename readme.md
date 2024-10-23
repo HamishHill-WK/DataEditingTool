@@ -4,6 +4,10 @@
 
 modules: pandas, numpy, dash
 
+Please open MAT510CaseStudy1.ipynb to use the application
+
+The csv for the dataset can be found in the Data/ directory
+
 ## Column Description
 <span style="font-size: 14px;">
 
