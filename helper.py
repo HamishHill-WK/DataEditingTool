@@ -2,7 +2,7 @@
 
 #counts the number of individual data points in an array
 def number_of_entries(my_map : map):
-    size = len(my_map) - 1 #subtract one to exclude the index 
+    size = len(my_map) 
     print('Number of data columns: ' + repr(size)) 
     first_value_length = len(my_map[next(iter(my_map))]) #get the length of the first array in the map. We only need the first array as they are all the same size
     total_data_number = first_value_length * size
@@ -68,10 +68,6 @@ def skew(array : list):
     skewness = (n * sum(((x - my_mean) / std_dev) ** 3 for x in array)) / ((n - 1) * (n - 2))
     return skewness
 
-#function to check if a variable is a numpy float or int
-def is_int_or_float(number):
-    return isinstance(number, (int, float))
-
 #check if a list only contains ints or floats
 def is_int_or_float_list(list : list):
     for item in list:
@@ -92,6 +88,7 @@ def ms_to_minutes_seconds(milliseconds):
     seconds = total_seconds % 60
     return str(repr(int(minutes)) + "m and " + repr(int(seconds)) + "s")
 
+#convert the duration_ms array to minutes and seconds
 def convert_ms_array(my_map : map):
     if 'duration_ms' in my_map['Column']:
         index = my_map['Column'].index('duration_ms')
