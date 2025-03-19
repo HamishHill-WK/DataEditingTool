@@ -2,12 +2,7 @@ from dash import Dash, html, dcc, callback, Output, Input
 import plotly.express as px
 import random
 import pandas as pd
-#I used ChatGPT gpt4o model to assist with some of the syntax for this library 
-#I used the 'minimal application' from the getting started guide as the starting point for this code https://dash.plotly.com/minimal-app
-
 #this function creates a dash app layout for comparing
-#I used ChatGPT gpt4o model to assist with some of the syntax for this library 
-#I used the 'minimal application' from the getting started guide as the starting point for this code https://dash.plotly.com/minimal-app
 def compare_axes(data : pd.DataFrame, app : Dash): #enforce type of arguments to avoid ambiguity
     numerical_columns = data.select_dtypes(include=['number']).columns #this variable is to ensure only numerical columns can be selected for the graph axes
     categorical_columns = data.select_dtypes(include=['object', 'category', 'string']).columns
