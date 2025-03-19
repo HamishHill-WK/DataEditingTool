@@ -1,6 +1,7 @@
 # Hamish Hill 
 
 ## Data Visualisation tool 
+modules: Dash, pandas, numpy
 
 ## Goal
 
